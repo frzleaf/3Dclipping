@@ -1,3 +1,9 @@
+/*
+ * Date created: 1/11/2015
+ * Author: Le Quang Thanh
+ */
+
+
 #include <queue>
 using namespace std;
 
@@ -104,10 +110,22 @@ GLbyte compare2p(const GLfloat* v1, const GLfloat* v2 ){
 	return res;
 }
 
+
+/*
+ * Is between 2 point?
+ */
+bool is_between(const GLfloat* a, const GLfloat* b, const GLfloat* c){
+	for ( int i = 3 ; i-- ; )
+		if (! ( b[0] <= std::max(a[0], c[0]) && b[0] >= std::min(a[0], c[0]) ) )
+			return false;
+	return true;
+}
+
+
 /*
  * Get the cross point of line ( head - tail ) with the plane ( r,l,u,o,f,a);
  */
-void get_cross_point(GLfloat* res, GLfloat* head, GLfloat* tail, GLchar plane = 'r'){
+void get_cross_point(GLfloat* res, GLfloat* head, GLfloat* tail, GLchar plane){
 
 	GLfloat dx = head[0] - tail[0];
 	GLfloat dy = head[1] - tail[1];
@@ -121,6 +139,9 @@ void get_cross_point(GLfloat* res, GLfloat* head, GLfloat* tail, GLchar plane = 
 			return;
 		res[1] = dy/dx*(res[0] - tail[0]) + tail[1];
 		res[2] = dz/dx*(res[0] - tail[0]) + tail[2];
+
+	if( !is_between(head, res, tail) )
+		res = NULL;
 	}
 	cout << "Crossing point: ";
 	for ( int i = 0 ; i < 3 ; ++i)
@@ -128,12 +149,11 @@ void get_cross_point(GLfloat* res, GLfloat* head, GLfloat* tail, GLchar plane = 
 	cout << endl;
 }
 
-
 /*
  * Move the dynamic shape into the main cube
  */
 void move_shape() {
-	center[0] += -0.01;
+	center[0] += -.01;
 	center[1] += 0.0;
 	center[2] += 0.0;
 	glutPostRedisplay();
@@ -153,10 +173,11 @@ void dynamic_display() {
 
 	vector<GLfloat*> q;
 	for (int i = 0; i < 4; ++i) {
-		GLfloat crosspnt[4][3];
+		GLfloat *crosspnt;
+		crosspnt = new GLfloat[3];
 		if (compare2p(vertices[i], vertices[i + 4]) == 1) {
-			get_cross_point(crosspnt[i], vertices[i], vertices[i + 4], 'r');
-			q.push_back(crosspnt[i]);
+			get_cross_point(crosspnt, vertices[i], vertices[i + 4], 'r');
+			q.push_back(crosspnt);
 		}
 	}
 	glBegin(GL_POLYGON);
@@ -164,6 +185,7 @@ void dynamic_display() {
 			GLfloat* x = q[i];
 			glVertex3f(x[0], x[1], x[2]);
 			cout << "POLYGON: " << x[0] << " " << x[1] << " " << x[2] << endl;
+			delete[] x;
 		}
 	glEnd();
 }

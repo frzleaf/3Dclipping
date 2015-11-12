@@ -8,7 +8,6 @@
 using namespace std;
 
 static GLfloat COLOR_WHITE[] = { 1.0, 1.0, 1.0, 1.0 };
-static bool motion = 0;
 
 void main_display() {
 	static_display();
@@ -27,25 +26,8 @@ void reshape(int w, int h) {
 	glViewport(0, 0, (GLsizei) w, (GLsizei) h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glFrustum(-2.0, 2.0, -1.0, 2.0, 4.0, 10.0);
+	glFrustum(-2.0, 2.0, -2.0, 2.0, 4.0, 10.0);
 	glMatrixMode(GL_MODELVIEW);
-}
-
-void mouse(int button, int state, int x, int y) {
-	switch (button) {
-	case GLUT_LEFT_BUTTON:
-		if (state == GLUT_DOWN){
-			if ( !motion )
-				glutIdleFunc(move_shape);
-			else
-				glutIdleFunc(NULL);
-			motion = !motion;
-		}
-		break;
-	case GLUT_RIGHT_BUTTON:
-	default:
-		break;
-	}
 }
 
 int main(int argc, char ** argv) {
@@ -59,6 +41,7 @@ int main(int argc, char ** argv) {
 	glutDisplayFunc(main_display);
 	glutReshapeFunc(reshape);
 	glutMouseFunc(mouse);
+	glutMotionFunc(mouse_motion);
 	glutMainLoop();
 
 	return 0;
