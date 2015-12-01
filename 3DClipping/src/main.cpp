@@ -36,7 +36,7 @@ int main(int argc, char ** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(600, 600);
 	glutInitWindowPosition(300, 100);
-	glutCreateWindow("Motion Example");
+	glutCreateWindow("3D clipping");
 	init();
 	glutDisplayFunc(main_display);
 	glutReshapeFunc(reshape);

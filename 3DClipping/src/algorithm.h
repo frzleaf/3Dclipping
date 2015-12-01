@@ -116,7 +116,7 @@ GLbyte compare2p(const GLfloat* v1, const GLfloat* v2 ){
  */
 bool is_between(const GLfloat* a, const GLfloat* b, const GLfloat* c){
 	for ( int i = 3 ; i-- ; )
-		if (! ( b[0] <= std::max(a[0], c[0]) && b[0] >= std::min(a[0], c[0]) ) )
+		if (! ( b[i] <= std::max(a[i], c[i]) && b[i] >= std::min(a[i], c[i]) ) )
 			return false;
 	return true;
 }
@@ -140,8 +140,12 @@ void get_cross_point(GLfloat* res, GLfloat* head, GLfloat* tail, GLchar plane){
 		res[1] = dy/dx*(res[0] - tail[0]) + tail[1];
 		res[2] = dz/dx*(res[0] - tail[0]) + tail[2];
 
-	if( !is_between(head, res, tail) )
-		res = NULL;
+		if( !is_between(head, res, tail) ){
+				res[0] = 999.99;
+				res[1] = 999.99;
+				res[2] = 999.99;
+				return;
+		}
 	}
 	cout << "Crossing point: ";
 	for ( int i = 0 ; i < 3 ; ++i)
@@ -177,15 +181,18 @@ void dynamic_display() {
 		crosspnt = new GLfloat[3];
 		if (compare2p(vertices[i], vertices[i + 4]) == 1) {
 			get_cross_point(crosspnt, vertices[i], vertices[i + 4], 'r');
-			q.push_back(crosspnt);
+			if ( crosspnt != NULL )
+				q.push_back(crosspnt);
 		}
 	}
 	glBegin(GL_POLYGON);
 		for ( int i = 0; i < q.size() ; ++i ){
-			GLfloat* x = q[i];
-			glVertex3f(x[0], x[1], x[2]);
-			cout << "POLYGON: " << x[0] << " " << x[1] << " " << x[2] << endl;
-			delete[] x;
+				GLfloat* x = q[i];
+//			if ( x != NULL ){
+				glVertex3f(x[0], x[1], x[2]);
+				cout << "POLYGON: " << x[0] << " " << x[1] << " " << x[2] << endl;
+				delete[] x;
+//			}
 		}
 	glEnd();
 }
